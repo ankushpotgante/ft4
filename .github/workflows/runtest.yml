@@ -38,7 +38,7 @@ jobs:
                   echo '```' >> report.md
                   echo "metrics from training:" >> report.md
                   echo '```' >> report.md
-                  cat metrics.csv >> report.md
+                  cat training_metrics.csv >> report.md
                   echo '```' >> report.md
                   cml comment create --publish report.md
                   
