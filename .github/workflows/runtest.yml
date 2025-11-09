@@ -1,0 +1,44 @@
+name: Sanity Test 1
+on:
+    pull_request:
+      types:
+        - opened
+        - reopened
+    push:
+      branches:
+        - main
+permissions:
+    contents: write
+    pull-requests: write
+jobs:
+    test_model:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                  python-version: '3.12'
+            - uses: iterative/setup-cml@v2
+            - name: Run tests
+              run: |
+                  pip install -r requirements.txt
+                  python -m test 2>&1 > test_output.txt
+
+            - name: Create CML Report
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+              run: |
+                  echo "test output:" > report.md
+                  echo '```' >> report.md
+                  cat test_output.txt >> report.md
+                  echo '```' >> report.md
+                  echo "metrics from training:" >> report.md
+                  echo '```' >> report.md
+                  cat training_metrics.csv >> report.md
+                  echo '```' >> report.md
+                  cml comment create --publish report.md
+                  
